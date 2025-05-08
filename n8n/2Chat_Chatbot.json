@@ -1,0 +1,416 @@
+{
+  "name": "2Chat Chatbot",
+  "nodes": [
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "2chatbot",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        0,
+        0
+      ],
+      "id": "6ad656e4-8553-41d3-87c7-5205e1da8fd8",
+      "name": "Webhook",
+      "webhookId": "ae00be9f-8b1c-4967-bfe0-b101f814faaa",
+      "notesInFlow": false
+    },
+    {
+      "parameters": {
+        "agent": "conversationalAgent",
+        "promptType": "define",
+        "text": "={{ $json.body.message }}",
+        "options": {
+          "systemMessage": "As a customer service agent, your primary goal is to assist customers effectively and efficiently. Here's how you should approach each interaction:\n\n<language_detection>Begin by detecting the language of the customer's query. Respond in the same language to ensure clear and effective communication.</language_detection>\n\n<understanding_query>Carefully read and understand the customer's question or issue. If the query is unclear, politely ask for more details to better assist them.</understanding_query>\n\n<providing_solutions>Offer accurate and helpful solutions based on the information available. If you don't know the answer, acknowledge it and offer to find out more or direct them to someone who can help.</providing_solutions>\n\n<empathy_professionalism>Maintain a friendly and professional tone throughout the interaction. Show empathy and understanding towards the customer's concerns.</empathy_professionalism>\n\n<follow_up>Ensure the customer is satisfied with the resolution. Ask if there's anything else you can assist with before concluding the interaction.</follow_up>\n\n<feedback>Encourage customers to provide feedback on the service to help improve future interactions.</feedback>\n\nBy following these guidelines, you will provide excellent customer service and build strong relationships with our customers."
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 1.7,
+      "position": [
+        360,
+        0
+      ],
+      "id": "d34b94f7-bbff-4bb8-960f-b9e27300ce7b",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "sessionIdType": "customKey",
+        "sessionKey": "={{ $('Webhook').item.json.body.phonenumber }}"
+      },
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.3,
+      "position": [
+        460,
+        280
+      ],
+      "id": "e617782c-f270-4531-bb6d-efa8911e9aab",
+      "name": "Window Buffer Memory"
+    },
+    {
+      "parameters": {
+        "respondWith": "json",
+        "responseBody": "={\n  \"answer\": \"{{ $json.output }}\"\n} ",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [
+        800,
+        0
+      ],
+      "id": "169041e7-a64f-4b27-a281-3f5c1bd5dee8",
+      "name": "Respond to Webhook"
+    },
+    {
+      "parameters": {
+        "formTitle": "Knowledge",
+        "formFields": {
+          "values": [
+            {
+              "fieldLabel": "Knowledge",
+              "fieldType": "textarea"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.formTrigger",
+      "typeVersion": 2.2,
+      "position": [
+        -20,
+        -480
+      ],
+      "id": "ea0b407a-92f0-4949-adf0-6fd80351a3f5",
+      "name": "On form submission",
+      "webhookId": "60aafc3a-649d-4d4b-a736-4b6c4dfc6fe6",
+      "disabled": true
+    },
+    {
+      "parameters": {
+        "mode": "insert",
+        "memoryKey": "knowledge"
+      },
+      "type": "@n8n/n8n-nodes-langchain.vectorStoreInMemory",
+      "typeVersion": 1,
+      "position": [
+        220,
+        -480
+      ],
+      "id": "902e8ea3-b20b-4a1f-a8a3-267d60b548c3",
+      "name": "In-Memory Vector Store"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.embeddingsOpenAi",
+      "typeVersion": 1.1,
+      "position": [
+        220,
+        -260
+      ],
+      "id": "4f36895d-bf6f-4dc3-8ebf-388f9d47fb11",
+      "name": "Embeddings OpenAI",
+      "credentials": {
+        "openAiApi": {
+          "id": "QudnyyPCGN5ie87c",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsonMode": "expressionData",
+        "jsonData": "={{ $json.Knowledge }}",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.documentDefaultDataLoader",
+      "typeVersion": 1,
+      "position": [
+        360,
+        -320
+      ],
+      "id": "a975209c-7158-4767-8fd7-d55e86e7e496",
+      "name": "Default Data Loader"
+    },
+    {
+      "parameters": {
+        "chunkOverlap": 100,
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.textSplitterRecursiveCharacterTextSplitter",
+      "typeVersion": 1,
+      "position": [
+        700,
+        -260
+      ],
+      "id": "cb78b053-b63e-40e4-bfd8-deda18a6d18d",
+      "name": "Recursive Character Text Splitter"
+    },
+    {
+      "parameters": {
+        "name": "KnowledgeBase",
+        "topK": 10
+      },
+      "type": "@n8n/n8n-nodes-langchain.toolVectorStore",
+      "typeVersion": 1,
+      "position": [
+        660,
+        260
+      ],
+      "id": "496100bf-c95a-489a-ad1e-d453b71770f8",
+      "name": "Vector Store Tool"
+    },
+    {
+      "parameters": {
+        "memoryKey": "knowledge"
+      },
+      "type": "@n8n/n8n-nodes-langchain.vectorStoreInMemory",
+      "typeVersion": 1,
+      "position": [
+        620,
+        460
+      ],
+      "id": "a11012c0-992d-4d5e-8955-c10f3cc19f3a",
+      "name": "In-Memory Vector Store1"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1,
+      "position": [
+        1140,
+        440
+      ],
+      "id": "9ce0e480-de77-4a3f-9e9a-e93365109992",
+      "name": "OpenAI Chat Model",
+      "credentials": {
+        "openAiApi": {
+          "id": "QudnyyPCGN5ie87c",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.embeddingsOpenAi",
+      "typeVersion": 1.1,
+      "position": [
+        720,
+        640
+      ],
+      "id": "47f20703-e71a-425c-8186-1a936c3dbe9f",
+      "name": "Embeddings OpenAI1",
+      "credentials": {
+        "openAiApi": {
+          "id": "QudnyyPCGN5ie87c",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1,
+      "position": [
+        320,
+        280
+      ],
+      "id": "690b9684-fce3-4391-ae07-2b9484d15862",
+      "name": "OpenAI Chat Model1",
+      "credentials": {
+        "openAiApi": {
+          "id": "QudnyyPCGN5ie87c",
+          "name": "OpenAi account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "## Add texts to Knowledgebase\n\nEnable the form submission and deactivate the webhook to enter the knowledge the chatbot will use in the in Memory Vector Store",
+        "height": 460,
+        "width": 1300
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -180,
+        -580
+      ],
+      "typeVersion": 1,
+      "id": "305ef8be-e3c4-4247-bed8-9700bd413c02",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {
+        "content": "## AI Chatbot agent\nEnable the webhook to load data into ",
+        "height": 880,
+        "width": 1460,
+        "color": 4
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -180,
+        -80
+      ],
+      "typeVersion": 1,
+      "id": "c3082ca2-5fcb-49f5-8f35-6700e2a6b490",
+      "name": "Sticky Note1"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Window Buffer Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "On form submission": {
+      "main": [
+        [
+          {
+            "node": "In-Memory Vector Store",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Embeddings OpenAI": {
+      "ai_embedding": [
+        [
+          {
+            "node": "In-Memory Vector Store",
+            "type": "ai_embedding",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Default Data Loader": {
+      "ai_document": [
+        [
+          {
+            "node": "In-Memory Vector Store",
+            "type": "ai_document",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Recursive Character Text Splitter": {
+      "ai_textSplitter": [
+        [
+          {
+            "node": "Default Data Loader",
+            "type": "ai_textSplitter",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Vector Store Tool": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "In-Memory Vector Store1": {
+      "ai_vectorStore": [
+        [
+          {
+            "node": "Vector Store Tool",
+            "type": "ai_vectorStore",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "Vector Store Tool",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Embeddings OpenAI1": {
+      "ai_embedding": [
+        [
+          {
+            "node": "In-Memory Vector Store1",
+            "type": "ai_embedding",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model1": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "e84c587a-da6b-4c5f-b7bb-5f8fbff21d3b",
+  "meta": {
+    "instanceId": "42b0153bb0b87911206cc83630f0a89581f3e06f37e89c4e54511a0dd577ace1"
+  },
+  "id": "p7hTq5J3PodLFm02",
+  "tags": []
+}

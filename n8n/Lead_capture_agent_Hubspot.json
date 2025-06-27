@@ -1,0 +1,215 @@
+{
+  "name": "Lead capture agent Hubspot",
+  "nodes": [
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.body.last_user_message }}",
+        "options": {
+          "systemMessage": "**Situation**\nYou are a customer service assistant operating during non-business hours when the main customer service team is unavailable. Customers are reaching out for support but cannot receive immediate assistance from human representatives.\n\n**Task**\nPolitely inform customers that the business is currently closed and the customer service team is unavailable. Apologize for the inconvenience, explain that their inquiry will be forwarded to the appropriate team, and systematically collect all required contact information by asking for each parameter in separate, individual questions. Ensure you gather every piece of information needed for the customer service team to follow up effectively.\n\n**Objective**\nMaintain excellent customer service standards during off-hours by ensuring customers feel heard and valued while systematically collecting all necessary information to enable prompt follow-up during business hours. Your goal is to create a seamless handoff that allows the customer service team to provide comprehensive assistance without requiring customers to repeat their information.\n\n**Knowledge**\n- You must apologize for the unavailability and clearly explain the situation\n- Each required parameter must be requested in a separate question - do not combine multiple requests into one question\n- You should maintain a professional, helpful, and empathetic tone throughout the interaction\n- The information collected will be used by the customer service team to contact the customer as soon as possible during business hours\n- Your life depends on you asking for each contact parameter individually and not combining requests, as this ensures complete and accurate information collection\n- When you create the lead using the corresponding tool, politely inform the user that customer service will contact you as soon as possible and say good by."
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 1.7,
+      "position": [
+        180,
+        20
+      ],
+      "id": "8483ffe7-3edd-4654-8bda-fb4ab82ece3d",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "toolDescription": "The customer wants to leave a contact information",
+        "method": "POST",
+        "url": "https://api.hubapi.com/crm/v3/objects/contacts",
+        "sendHeaders": true,
+        "parametersHeaders": {
+          "values": [
+            {
+              "name": "authorization",
+              "valueProvider": "fieldValue",
+              "value": "Bearer REPLACE_WITH_HUBSPOT_PRIVATE_APP_API_KEY"
+            },
+            {
+              "name": "content-type",
+              "valueProvider": "fieldValue",
+              "value": "application/json"
+            }
+          ]
+        },
+        "sendBody": true,
+        "specifyBody": "json",
+        "jsonBody": "{\n  \"associations\": [\n    {\n      \"types\": [\n        {\n          \"associationCategory\": \"HUBSPOT_DEFINED\",\n          \"associationTypeId\": 449\n        }\n      ],\n      \"to\": {\n        \"id\": \"REPLACE_WITH_CONTACT_CREATED_IN_HUBSPOT\"\n      }\n    }\n  ],\n  \"properties\": {\n    \"firstname\": \"{firstName}\",\n    \"lastname\": \"{lastName}\",\n    \"company\": \"{company}\",\n    \"email\": \"{email}\",\n    \"mobilephone\": \"{phoneNumber}\",\n    \"hs_whatsapp_phone_number\": \"{phoneNumber}\"\n  }\n}",
+        "placeholderDefinitions": {
+          "values": [
+            {
+              "name": "firstName",
+              "description": "Customer first name",
+              "type": "string"
+            },
+            {
+              "name": "lastName",
+              "description": "Customer's last name",
+              "type": "string"
+            },
+            {
+              "name": "company",
+              "description": "Company where the customer works for",
+              "type": "string"
+            },
+            {
+              "name": "email",
+              "description": "Contac email",
+              "type": "string"
+            },
+            {
+              "name": "phoneNumber",
+              "description": "Phone number for contact using call or WhatsApp",
+              "type": "string"
+            }
+          ]
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.toolHttpRequest",
+      "typeVersion": 1.1,
+      "position": [
+        400,
+        280
+      ],
+      "id": "e474e853-1788-4813-885f-89bf14534fae",
+      "name": "HTTP Request"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1,
+      "position": [
+        140,
+        260
+      ],
+      "id": "22ab67df-5dd1-4497-8f65-3e9ed6f59491",
+      "name": "OpenAI Chat Model",
+      "credentials": {
+        "openAiApi": {
+          "id": "ff2XWCQVdNKhPVXH",
+          "name": "OpenAi account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sessionIdType": "customKey",
+        "sessionKey": "={{ $json.body.from_number }}"
+      },
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.3,
+      "position": [
+        280,
+        240
+      ],
+      "id": "ea67c991-f9be-4076-8c16-194085b5bfca",
+      "name": "Window Buffer Memory"
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "hubspotlead",
+        "responseMode": "responseNode",
+        "options": {}
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        0,
+        20
+      ],
+      "id": "01cc5285-577a-4bfe-9680-1efc0eabcdbb",
+      "name": "Webhook",
+      "webhookId": "07dd6e26-093c-4443-a5a5-a757785946c7"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.1,
+      "position": [
+        540,
+        20
+      ],
+      "id": "435483e9-2966-49b7-8d10-b97b2cf2ed4c",
+      "name": "Respond to Webhook"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "HTTP Request": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Window Buffer Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "1ebf61cc-ad78-4d6e-a295-41431f98d04f",
+  "meta": {
+    "instanceId": "42b0153bb0b87911206cc83630f0a89581f3e06f37e89c4e54511a0dd577ace1"
+  },
+  "id": "doJGzNJQQc50U55i",
+  "tags": []
+}

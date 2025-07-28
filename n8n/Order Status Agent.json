@@ -1,0 +1,202 @@
+{
+  "name": "Order Status Agent",
+  "nodes": [
+    {
+      "parameters": {
+        "promptType": "define",
+        "text": "={{ $json.body.last_user_message }}",
+        "options": {
+          "systemMessage": "**Situation**\nYou are a customer service AI assistant specializing in order information retrieval for a company's purchase order system. Customers interact with you to obtain specific details about their orders.\n\n**Task**\nRetrieve and display precise order information when a customer provides a valid order number. Verify the order number's authenticity and provide a comprehensive yet concise order status report.\n\n**Objective**\nDeliver accurate, transparent, and helpful order information to enhance customer satisfaction and support efficient customer service interactions.\n\n**Knowledge**\n- Required input: Valid Order Number\n- Available order information fields: \n  1. OrderID\n  2. OrderStatus\n  3. Notes\n  4. CustomerName\n  5. DeliveryDate\n- Strict validation required for order number input\n- Protect customer data privacy\n\n**Constraints**\n- Only respond with order details if a valid order number is provided\n- Do not fabricate or guess order information\n- If order number is invalid, return a clear, apologetic message explaining the issue\n\n**Response Guidelines**\n1. Confirm the order number's validity\n2. If valid, display all available order information in a clear, structured format\n3. If invalid, provide a helpful guidance message\n4. Maintain a professional and supportive tone throughout the interaction\n\n**Error Handling**\n- If no order number is provided, prompt the customer to enter their order number\n- If multiple order numbers are entered, request clarification\n- Ensure no sensitive information is disclosed inappropriately"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 2,
+      "position": [
+        220,
+        0
+      ],
+      "id": "c56bc3ea-3d80-4bc0-98ef-7e378060b0a4",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "model": {
+          "__rl": true,
+          "mode": "list",
+          "value": "gpt-4.1-mini"
+        },
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenAi",
+      "typeVersion": 1.2,
+      "position": [
+        140,
+        220
+      ],
+      "id": "bf560dae-7776-48e6-8187-78ac95ccd546",
+      "name": "OpenAI Chat Model",
+      "credentials": {
+        "openAiApi": {
+          "id": "ff2XWCQVdNKhPVXH",
+          "name": "OpenAi account 2"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "sessionIdType": "customKey",
+        "sessionKey": "={{ $json.body.from_number }}"
+      },
+      "type": "@n8n/n8n-nodes-langchain.memoryBufferWindow",
+      "typeVersion": 1.3,
+      "position": [
+        300,
+        220
+      ],
+      "id": "8c0b0f48-9efe-4fb7-b9e0-4a47182489b3",
+      "name": "Simple Memory"
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1hiFbH1pm-wKqfvXUT6SoB_MFWwhH0OJ9RZITkGKM7HI",
+          "mode": "list",
+          "cachedResultName": "2Chat Order Status",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1hiFbH1pm-wKqfvXUT6SoB_MFWwhH0OJ9RZITkGKM7HI/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1457908319,
+          "mode": "list",
+          "cachedResultName": "Orders",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1hiFbH1pm-wKqfvXUT6SoB_MFWwhH0OJ9RZITkGKM7HI/edit#gid=1457908319"
+        },
+        "filtersUI": {
+          "values": [
+            {
+              "lookupColumn": "OrderID",
+              "lookupValue": "={{ /*n8n-auto-generated-fromAI-override*/ $fromAI('values0_Value', ``, 'string') }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheetsTool",
+      "typeVersion": 4.6,
+      "position": [
+        540,
+        220
+      ],
+      "id": "e91fdea2-ac2a-4cae-99c5-ec6e5fd64e9a",
+      "name": "Get row(s) in sheet in Google Sheets",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "hdrtTDFkcbaD19uz",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "httpMethod": "POST",
+        "path": "chatbotorder",
+        "responseMode": "responseNode",
+        "options": {
+          "allowedOrigins": "*"
+        }
+      },
+      "type": "n8n-nodes-base.webhook",
+      "typeVersion": 2,
+      "position": [
+        60,
+        0
+      ],
+      "id": "3c17bf03-c3e8-4f60-9bdc-1b94279dacfc",
+      "name": "Webhook",
+      "webhookId": "6883a739-658d-417b-aa35-602868d59a34"
+    },
+    {
+      "parameters": {
+        "options": {}
+      },
+      "type": "n8n-nodes-base.respondToWebhook",
+      "typeVersion": 1.4,
+      "position": [
+        580,
+        0
+      ],
+      "id": "ad67675e-15ba-4daa-8830-18f960bd46c8",
+      "name": "Respond to Webhook"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "OpenAI Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Simple Memory": {
+      "ai_memory": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_memory",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get row(s) in sheet in Google Sheets": {
+      "ai_tool": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_tool",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Webhook": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "Respond to Webhook",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "a7ffde8a-ca93-4fc8-a6d0-fe7cd69fa1d2",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "42b0153bb0b87911206cc83630f0a89581f3e06f37e89c4e54511a0dd577ace1"
+  },
+  "id": "7G16zVoMWl4WJJ1k",
+  "tags": []
+}

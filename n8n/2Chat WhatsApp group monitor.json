@@ -1,0 +1,323 @@
+{
+  "name": "2Chat WhatsApp group monitor",
+  "nodes": [
+    {
+      "parameters": {
+        "operation": "appendOrUpdate",
+        "documentId": {
+          "__rl": true,
+          "value": "1xLpS6U4-ktBaPVq70WmhFCoXt8N6pCQfVn19IAiD2O0",
+          "mode": "list",
+          "cachedResultName": "2Chat Grooup Monitor",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1xLpS6U4-ktBaPVq70WmhFCoXt8N6pCQfVn19IAiD2O0/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "GroupMonitor",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1xLpS6U4-ktBaPVq70WmhFCoXt8N6pCQfVn19IAiD2O0/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "phone_number": "={{ $json.participant.phone_number }}",
+            "wa_group_name": "={{ $json.group.wa_group_name }}",
+            "updated_at": "={{ $json.receivedAt }}",
+            "event": "={{ $json.type }}",
+            "friendly_name": "={{ $json.participant.contact }}"
+          },
+          "matchingColumns": [
+            "phone_number"
+          ],
+          "schema": [
+            {
+              "id": "phone_number",
+              "displayName": "phone_number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "friendly_name",
+              "displayName": "friendly_name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "updated_at",
+              "displayName": "updated_at",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "wa_group_name",
+              "displayName": "wa_group_name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "event",
+              "displayName": "event",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        96,
+        -320
+      ],
+      "id": "ac54c683-6052-4150-9ecb-33aea16fc1af",
+      "name": "Append or update row in sheet",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "6",
+          "name": "gcastano@nagence.com - Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "1xLpS6U4-ktBaPVq70WmhFCoXt8N6pCQfVn19IAiD2O0",
+          "mode": "list",
+          "cachedResultName": "2Chat Grooup Monitor",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1xLpS6U4-ktBaPVq70WmhFCoXt8N6pCQfVn19IAiD2O0/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "GroupMonitor",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1xLpS6U4-ktBaPVq70WmhFCoXt8N6pCQfVn19IAiD2O0/edit#gid=0"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "phone_number": "={{ $json.author.phone_number }}",
+            "friendly_name": "={{ $json.author.contact.name }}",
+            "updated_at": "={{ $json.receivedAt }}",
+            "wa_group_name": "={{ $json.group.wa_group_name }}",
+            "event": "={{ $json.type }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "phone_number",
+              "displayName": "phone_number",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "friendly_name",
+              "displayName": "friendly_name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "updated_at",
+              "displayName": "updated_at",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "wa_group_name",
+              "displayName": "wa_group_name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "event",
+              "displayName": "event",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        144,
+        32
+      ],
+      "id": "1e1a3bf4-14c6-4487-8c0c-25a14fafdee6",
+      "name": "Append row in sheet",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "6",
+          "name": "gcastano@nagence.com - Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "event": "whatsapp.group.join",
+        "whatsappNumber": "+573054684700",
+        "on_group": "all"
+      },
+      "type": "@2chat/n8n-nodes-twochat.twoChatTrigger",
+      "typeVersion": 1,
+      "position": [
+        -80,
+        -320
+      ],
+      "id": "95bc659c-6194-4686-bd78-95d8d5e96497",
+      "name": "2Chat Trigger Join",
+      "webhookId": "2e9b7775-2997-464a-960d-2efbaeae315e",
+      "credentials": {
+        "twoChatApi": {
+          "id": "AVJMWXbWU3fvXJjG",
+          "name": "2Chat Demo Company"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "event": "whatsapp.group.leave",
+        "whatsappNumber": "+573054684700",
+        "on_group": "all"
+      },
+      "type": "@2chat/n8n-nodes-twochat.twoChatTrigger",
+      "typeVersion": 1,
+      "position": [
+        -64,
+        32
+      ],
+      "id": "33db594a-0ee4-48c5-8f5b-42b2391c9822",
+      "name": "2Chat Trigger Left",
+      "webhookId": "a43374fa-c3c1-483c-89eb-1cc96f60ec53",
+      "credentials": {
+        "twoChatApi": {
+          "id": "AVJMWXbWU3fvXJjG",
+          "name": "2Chat Demo Company"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "content": "### This n8n template demonstrates how to **automatically track WhatsApp group membership changes** using **2Chat** for WhatsApp integration and **Google Sheets** for data recording. The workflow detects when users join or leave any monitored WhatsApp group and logs these events in a Google Sheet, enabling group managers to generate statistics and reports effortlessly.\n\n**Good to know**\n- This workflow uses **2Chat** to monitor WhatsApp groups, so you’ll need a 2Chat account and a connected WhatsApp number with admin access to the groups you want to monitor.\n- A **Google Sheets** account and a spreadsheet are required to store the membership change data.\n- The workflow can be customized to include additional data points or notifications as needed.\n\n---\n### How it works\n- **Trigger:** The workflow starts when a **2Chat** node detects a user joining or leaving a monitored WhatsApp group.\n- **Event Detection:** The trigger node captures the event type (join/leave) and the user’s details.\n- **Data Formatting:** The relevant information (e.g., user name, phone number, group name, event type, and timestamp) is formatted for recording.\n- **Google Sheets Update:** The formatted data is appended to a specified Google Sheet, creating a log of all membership changes.\n- **Automation:** Group managers can use the logged data in Google Sheets to generate reports, analyze trends, or monitor group activity automatically.",
+        "height": 720,
+        "width": 432
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -672,
+        -432
+      ],
+      "typeVersion": 1,
+      "id": "c17f2603-1264-4396-bbc3-f0aec759efc9",
+      "name": "Sticky Note"
+    },
+    {
+      "parameters": {
+        "content": "## Monitor WhatsApp group joins ",
+        "height": 336,
+        "width": 592,
+        "color": 4
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -208,
+        -432
+      ],
+      "typeVersion": 1,
+      "id": "b25b0675-eb2e-402c-8f57-af284d2a1ade",
+      "name": "Sticky Note1"
+    },
+    {
+      "parameters": {
+        "content": "## Monitor WhatsApp group leaves",
+        "height": 336,
+        "width": 592,
+        "color": 3
+      },
+      "type": "n8n-nodes-base.stickyNote",
+      "position": [
+        -208,
+        -48
+      ],
+      "typeVersion": 1,
+      "id": "183d533d-c3ae-4aab-8914-f16e6ad755d1",
+      "name": "Sticky Note2"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "2Chat Trigger Join": {
+      "main": [
+        [
+          {
+            "node": "Append or update row in sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "2Chat Trigger Left": {
+      "main": [
+        [
+          {
+            "node": "Append row in sheet",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": true,
+  "settings": {
+    "executionOrder": "v1"
+  },
+  "versionId": "eb307e20-9dcf-406a-8030-aabf2124d376",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "42b0153bb0b87911206cc83630f0a89581f3e06f37e89c4e54511a0dd577ace1"
+  },
+  "id": "SgPY4ZbzKV5UTHXe",
+  "tags": []
+}
